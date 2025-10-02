@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <rect width="800" height="800" fill="#0a0014" />
+  <g fill="#ffffff" opacity="0.5">
+    <circle cx="100" cy="100" r="1" />
+    <circle cx="200" cy="150" r="1" />
+    <circle cx="300" cy="50" r="1" />
+    <circle cx="400" cy="200" r="1" />
+    <circle cx="500" cy="100" r="1" />
+    <circle cx="600" cy="150" r="1" />
+    <circle cx="700" cy="50" r="1" />
+    <circle cx="150" cy="250" r="1" />
+    <circle cx="250" cy="350" r="1" />
+    <circle cx="350" cy="300" r="1" />
+    <circle cx="450" cy="400" r="1" />
+    <circle cx="550" cy="350" r="1" />
+    <circle cx="650" cy="450" r="1" />
+    <circle cx="750" cy="500" r="1" />
+    <circle cx="125" cy="550" r="1" />
+    <circle cx="225" cy="600" r="1" />
+    <circle cx="325" cy="650" r="1" />
+    <circle cx="425" cy="700" r="1" />
+    <circle cx="525" cy="750" r="1" />
+    <circle cx="625" cy="650" r="1" />
+    <circle cx="725" cy="700" r="1" />
+  </g>
+  
+  <!-- Aviator text -->
+  <text x="400" y="150" font-family="Arial" font-size="100" font-style="italic" font-weight="bold" fill="white" text-anchor="middle">Aviator</text>
+  
+  <!-- Airplane -->
+  <g transform="translate(400, 350) scale(1.5)">
+    <path d="M22 16.21v-1.895L14 8V4a2 2 0 0 0-4 0v4L2 14.315v1.895l8-2.63V18l-3 2v2l5-1 5 1v-2l-3-2v-4.42l8 2.63z" fill="#e74c3c" />
+  </g>
+  
+  <!-- Predictor text -->
+  <text x="400" y="550" font-family="Arial" font-size="100" font-weight="bold" fill="white" text-anchor="middle">predictor</text>
+</svg> 
