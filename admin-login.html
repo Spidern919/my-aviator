@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviator Admin Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #2d1414;
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container {
+            background-color: #3c1414;
+            border-radius: 10px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-header h1 {
+            color: #ff2d2d;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ff2d2d;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+        }
+        .form-group input:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff2d2d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .login-button:hover {
+            background-color: #e62222;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #ff2d2d;
+            text-decoration: none;
+        }
+        .error-message {
+            background-color: rgba(231, 76, 60, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+        /* Add shake animation for error feedback */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        /* Add subtle hover effect to login button */
+        .login-button:hover {
+            background-color: #e62222;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(230, 34, 34, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Aviator Admin</h1>
+            <p>Enter your credentials to access the admin dashboard</p>
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            Invalid username or password!
+        </div>
+        
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter admin username">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter admin password">
+        </div>
+        
+        <button class="login-button" id="loginButton">Login</button>
+        <a href="aviator.html" class="back-link">Back to Game</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginButton = document.getElementById('loginButton');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Demo credentials (in a real app, this would be authenticated server-side)
+            const adminUsername = 'admin';
+            const adminPassword = 'admin123';
+            
+            // Simple hash function for basic token generation
+            function hashString(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // Convert to 32bit integer
+                }
+                return hash.toString(16);
+            }
+            
+            // Check if already authenticated to redirect directly
+            if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+                const token = sessionStorage.getItem('adminToken');
+                const expectedToken = hashString(adminUsername + ':' + adminPassword + ':aviatoradmin');
+                
+                if (token === expectedToken) {
+                    window.location.href = 'admin-dashboard.html';
+                    return;
+                } else {
+                    // Invalid token, clear it
+                    sessionStorage.removeItem('adminAuthenticated');
+                    sessionStorage.removeItem('adminToken');
+                }
+            }
+            
+            loginButton.addEventListener('click', function() {
+                authenticateUser();
+            });
+            
+            // Allow Enter key to submit the form
+            passwordInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    authenticateUser();
+                }
+            });
+            
+            usernameInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    passwordInput.focus();
+                }
+            });
+            
+            // Clear error message when user starts typing
+            usernameInput.addEventListener('input', function() {
+                errorMessage.style.display = 'none';
+            });
+            
+            passwordInput.addEventListener('input', function() {
+                errorMessage.style.display = 'none';
+            });
+            
+            function authenticateUser() {
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value;
+                
+                // Disable login button and show loading state
+                loginButton.disabled = true;
+                loginButton.textContent = "Authenticating...";
+                loginButton.style.opacity = "0.7";
+                
+                // Simulate server delay for more realistic experience
+                setTimeout(() => {
+                    if (username === adminUsername && password === adminPassword) {
+                        // Create a simple token
+                        const token = hashString(username + ':' + password + ':aviatoradmin');
+                        
+                        // Set authenticated flag in session storage
+                        sessionStorage.setItem('adminAuthenticated', 'true');
+                        sessionStorage.setItem('adminToken', token);
+                        sessionStorage.setItem('adminLoginTime', Date.now().toString());
+                        
+                        // Redirect to admin dashboard with success animation
+                        loginButton.textContent = "Success!";
+                        loginButton.style.backgroundColor = "#2ecc71";
+                        
+                        setTimeout(() => {
+                            window.location.href = 'admin-dashboard.html';
+                        }, 500);
+                    } else {
+                        // Show error message with animation
+                        errorMessage.style.display = 'block';
+                        errorMessage.style.animation = 'shake 0.5s';
+                        
+                        // Reset animation after it completes
+                        setTimeout(() => {
+                            errorMessage.style.animation = '';
+                        }, 500);
+                        
+                        // Clear password field
+                        passwordInput.value = '';
+                        
+                        // Reset login button
+                        loginButton.disabled = false;
+                        loginButton.textContent = "Login";
+                        loginButton.style.opacity = "1";
+                        
+                        // Focus on username if empty, otherwise focus on password
+                        if (username === '') {
+                            usernameInput.focus();
+                        } else {
+                            passwordInput.focus();
+                        }
+                    }
+                }, 800); // Simulate network delay
+            }
+        });
+    </script>
+</body>
+</html> 

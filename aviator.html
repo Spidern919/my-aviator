@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1Win.or.ke</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+                        body {            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%);            color: white;            height: 100vh;            display: flex;            flex-direction: column;            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 25px;
+            background: linear-gradient(90deg, rgba(45, 10, 26, 0.95) 0%, rgba(26, 10, 26, 0.95) 100%);
+            border-bottom: 2px solid rgba(255, 45, 45, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+
+        .logo {
+            color: #ff2d2d;
+            font-size: 32px;
+            font-weight: 800;
+            font-style: italic;
+            text-shadow: 0 0 20px rgba(255, 45, 45, 0.5);
+            letter-spacing: 1px;
+        }
+        .balance-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .balance-label {
+                        color: #ff2d2d;            font-size: 14px;            text-transform: uppercase;
+        }
+        .balance {
+            color: #4cd964;
+            font-size: 20px;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(76, 217, 100, 0.3);
+        }
+        .balance-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .balance-button {
+            background: linear-gradient(135deg, #ff2d2d 0%, #e74c3c 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 45, 45, 0.3);
+        }
+        .balance-button:hover {
+            background-color: #ff4d4d;
+        }
+        .balance-button.deposit {
+            background-color: #4cd964;
+        }
+        .balance-button.deposit:hover {
+            background-color: #3cb853;
+        }
+        .balance-button.withdraw {
+            background-color: #ff9500;
+        }
+        .balance-button.withdraw:hover {
+            background-color: #ff8000;
+        }
+        .currency-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .currency-dropdown select {
+                        appearance: none;            background-color: #6a0a0a;            color: white;
+            padding: 5px 25px 5px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+        .currency-dropdown::after {
+            content: "▼";
+            font-size: 10px;
+            color: white;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        .previous-results {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            background-color: #2d0a0a; /* Darker red to match header */
+            padding: 10px 20px;
+        }
+        .result-bubble {
+            background-color: transparent;
+            padding: 5px 8px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for flex containers to prevent overflow */
+        }
+        .game-canvas {
+            flex: 1;
+            position: relative;
+            /* Black with purple radial rays */
+            background: radial-gradient(ellipse at 0% 100%, #3a0057 0%, #1a0a1a 60%, #000 100%);
+            overflow: hidden;
+            min-height: 300px;
+        }
+        .game-canvas::before {
+            content: '';
+            position: absolute;
+            left: 0; bottom: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            background: repeating-conic-gradient(
+                from 270deg,
+                rgba(120,0,180,0.15) 0deg 10deg,
+                transparent 10deg 20deg
+            );
+        }
+        .sunburst {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-conic-gradient(#000 0deg 10deg, #222 10deg 20deg);
+            opacity: 0.3;
+        }
+        .multiplier {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 64px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 45, 45, 0.7);
+            z-index: 10;
+        }
+        .airplane {
+            position: absolute;
+            width: 120px;
+            height: 80px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23e74c3c"><path d="M22 16.21v-1.895L14 8V4a2 2 0 0 0-4 0v4L2 14.315v1.895l8-2.63V18l-3 2v2l5-1 5 1v-2l-3-2v-4.42l8 2.63z"/><text x="12" y="14" font-family="Arial" font-size="8" font-weight="bold" fill="white" text-anchor="middle">X</text></svg>');
+            background-repeat: no-repeat;
+            background-size: contain;
+            transform-origin: center;
+            left: 10%;
+            bottom: 10%;
+            z-index: 5;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            transform: rotate(45deg);
+        }
+        .propeller {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23333333"><circle cx="12" cy="12" r="3" /><rect x="11" y="0" width="2" height="10" transform-origin="12 12"><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.3s" repeatCount="indefinite" /></rect><rect x="11" y="0" width="2" height="10" transform-origin="12 12" transform="rotate(90)"><animateTransform attributeName="transform" type="rotate" from="90" to="450" dur="0.3s" repeatCount="indefinite" /></rect></svg>');
+            transform-origin: center;
+            z-index: 6;
+        }
+        .stats-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+        }
+                .stats-panel h3 {            margin-bottom: 5px;            color: #ff2d2d; /* Red header */        }
+        .betting-controls {
+            display: flex;
+            background-color: #2d0a0a; /* Darker red background */
+            padding: 20px;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .betting-card {
+            background-color: rgba(60, 10, 10, 0.8); /* Darker red with transparency */
+            border-radius: 10px;
+            padding: 15px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            min-width: 280px;
+            max-width: 400px;
+        }
+        .bet-header {
+            display: flex;
+            justify-content: space-between;
+        }
+        .bet-header button {
+            background-color: #6a0a0a; /* Darker red for button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .bet-input {
+            display: flex;
+            background-color: #6a0a0a; /* Darker red background */
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .bet-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background-color: transparent;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+        }
+        .bet-amount-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+                .bet-amount {            flex: 1;            background-color: #4a0a0a; /* Darker red background */            color: white;            border: none;            border-radius: 5px;            padding: 5px 0;            text-align: center;            cursor: pointer;            min-width: 60px;        }
+        .bet-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        .bet-button.place-bet {
+            background-color: #4cd964;
+            color: white;
+        }
+        .bet-button.cashout {
+            background-color: #e74c3c;
+            color: white;
+            display: none;
+        }
+        .bet-button.cashout.pulse {
+            animation: button-pulse 0.5s infinite;
+        }
+        .bet-button.disabled {
+            background-color: #333;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+                .admin-button {            position: fixed;            bottom: 10px;            left: 10px;            background-color: #ff2d2d; /* Bright red button */            color: transparent;            border: none;            border-radius: 50%;            width: 12px;            height: 12px;            padding: 0;            cursor: pointer;            z-index: 100;        }
+        
+        /* Media queries for responsive design */
+        @media (max-width: 768px) {
+            .multiplier {
+                font-size: 48px;
+            }
+            .admin-dashboard {
+                width: 280px;
+            }
+            .stats-panel {
+                font-size: 12px;
+            }
+            .betting-card {
+                min-width: 240px;
+            }
+            .bet-amount-controls {
+                gap: 5px;
+            }
+            .bet-amount {
+                font-size: 12px;
+                padding: 5px 2px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px;
+            }
+            .logo {
+                font-size: 22px;
+            }
+            .balance {
+                font-size: 16px;
+            }
+            .multiplier {
+                font-size: 36px;
+            }
+            .previous-results {
+                padding: 8px 10px;
+            }
+            .result-bubble {
+                font-size: 12px;
+                padding: 4px 6px;
+            }
+            .betting-controls {
+                padding: 10px;
+                gap: 10px;
+            }
+            .betting-card {
+                padding: 10px;
+                gap: 8px;
+                min-width: 100%;
+            }
+            .bet-header {
+                font-size: 14px;
+            }
+            .bet-input input {
+                font-size: 14px;
+                padding: 8px;
+            }
+            .bet-amount {
+                font-size: 11px;
+            }
+            .bet-button {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .admin-button {
+                bottom: 10px;
+                left: 10px;
+                width: 12px;
+                height: 12px;
+                padding: 0;
+            }
+            .admin-dashboard {
+                width: 100%;
+                height: 70%;
+                border-radius: 10px 10px 0 0;
+            }
+            .airplane {
+                width: 80px;
+                height: 60px;
+            }
+            .propeller {
+                width: 10px;
+                height: 10px;
+            }
+        }
+        
+        /* Add animation for loading indicator */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        #loadingIndicator {
+            animation: pulse 1s infinite;
+            text-shadow: 0 0 10px #ff4d6d;
+        }
+        
+        /* Loading progress bar */
+        .loading-bar-container {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .loading-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: auto;
+            height: 100%;
+            background-color: #ff4d6d;
+            animation: loading-animation 5s linear forwards;
+            width: 0%;
+        }
+        
+        @keyframes loading-animation {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes button-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Predictor Modal Styles */
+        .predictor-modal {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .predictor-modal.active {
+            display: block;
+        }
+
+        .predictor-content {
+            background-color: #1a0a0a;
+            border: 8px solid #ffffff;
+            border-radius: 20px;
+            width: 140px;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 45, 45, 0.3);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Smartphone notch */
+        .predictor-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 15px;
+            background-color: #2d1414;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            z-index: 2;
+            border: 8px solid #ffffff;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .predictor-title {
+            color: #ff2d2d;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        .predictor-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4cd964;
+            text-shadow: 0 0 10px rgba(76, 217, 100, 0.5);
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .predictor-current {
+            font-size: 16px;
+            color: #ff2d2d;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .predictor-countdown {
+            font-size: 14px;
+            color: #ff9500;
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        .predictor-label {
+            font-size: 12px;
+            color: #ff2d2d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .predictor-close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        /* Smartphone status bar */
+        .predictor-status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background-color: #1a0a0a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 10px;
+            color: #ff2d2d;
+        }
+
+        .predictor-status-bar::before {
+            content: '12:00';
+        }
+
+        .predictor-status-bar::after {
+            content: '📶 🔋';
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .predictor-content.pulse {
+            animation: pulse 1s infinite;
+        }
+
+        /* Smartphone home indicator */
+        .predictor-home-indicator {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 4px;
+            background-color: #ff2d2d;
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        /* Auto Bet Modal Styles */
+        .auto-bet-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auto-bet-modal.active {
+            display: flex;
+        }
+
+        .auto-bet-content {
+            background-color: #1a0a0a;
+            border: 2px solid #ff2d2d;
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            color: white;
+        }
+
+        .auto-bet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ff2d2d;
+        }
+
+        .auto-bet-header h2 {
+            color: #ff2d2d;
+            margin: 0;
+        }
+
+        .auto-bet-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .auto-bet-form-group {
+            margin-bottom: 15px;
+        }
+
+        .auto-bet-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ff2d2d;
+        }
+
+        .auto-bet-form-group input {
+            width: 100%;
+            padding: 8px;
+            background-color: #3c1414;
+            border: 1px solid #ff2d2d;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .auto-bet-form-group input:focus {
+            outline: none;
+            border-color: #ff4d4d;
+        }
+
+        .auto-bet-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .auto-bet-button {
+            background-color: #ff2d2d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .auto-bet-button:hover {
+            background-color: #ff4d4d;
+        }
+
+        .auto-bet-active {
+            background-color: #4cd964 !important;
+        }
+
+        .auto-bet-active:hover {
+            background-color: #3cb853 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Aviator</div>
+        <div class="balance-container">
+            <div>
+                <div class="balance-label">Balance</div>
+                <div class="balance" id="balanceDisplay">5,000.00</div>
+            </div>
+            <div class="balance-actions">
+                <button class="balance-button deposit">Deposit</button>
+                <button class="balance-button withdraw">Withdraw</button>
+            </div>
+            <div class="currency-dropdown">
+                <select id="currencySelector">
+                    <option value="KES">KES</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                    <option value="JPY">JPY</option>
+                    <option value="ETB">ETB</option>
+                    <option value="PKR">PKR</option>
+                    <option value="GMD">GMD</option>
+                    <option value="ZAR">ZAR</option>
+                    <option value="BTC">BTC</option>
+                    <option value="ETH">ETH</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="previous-results">
+        <!-- Previous results will be populated dynamically -->
+    </div>
+    
+    <div class="game-container">
+        <div class="game-canvas">
+            <div class="sunburst"></div>
+            <div class="multiplier">1.00x</div>
+            <canvas class="game-trail" id="gameTrail"></canvas>
+            <div class="airplane"></div>
+            <div class="propeller"></div>
+            <div class="stats-panel">
+                <h3><span id="successfulBets">394</span>/<span id="totalBets">446</span> Bets</h3>
+                <h3>Total Win: <span id="totalWinAmount">162,719.85</span> <span id="totalWinCurrency">KES</span></h3>
+            </div>
+        </div>
+        
+        <div class="betting-controls">
+            <div class="betting-card">
+                <div class="bet-header">
+                    <span>Bet</span>
+                    <button>Auto</button>
+                </div>
+                <div class="bet-input">
+                    <input type="number" id="bet1Amount" value="10.00">
+                </div>
+                <div class="bet-amount-controls">
+                    <button class="bet-amount">100.00</button>
+                    <button class="bet-amount">200.00</button>
+                    <button class="bet-amount">500.00</button>
+                    <button class="bet-amount">10,000.00</button>
+                </div>
+                <button class="bet-button place-bet" id="bet1Button">Bet<br>10.00 KES</button>
+                <button class="bet-button cashout" id="cashout1Button">Cash Out</button>
+            </div>
+            
+            <div class="betting-card">
+                <div class="bet-header">
+                    <span>Bet</span>
+                    <button>Auto</button>
+                </div>
+                <div class="bet-input">
+                    <input type="number" id="bet2Amount" value="10.00">
+                </div>
+                <div class="bet-amount-controls">
+                    <button class="bet-amount">100.00</button>
+                    <button class="bet-amount">200.00</button>
+                    <button class="bet-amount">500.00</button>
+                    <button class="bet-amount">10,000.00</button>
+                </div>
+                <button class="bet-button place-bet" id="bet2Button">Bet<br>10.00 KES</button>
+                <button class="bet-button cashout" id="cashout2Button">Cash Out</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="admin-button">Admin</button>
+
+    <!-- Replace Admin Modal with Predictor Modal -->
+    <div class="predictor-modal" id="predictorModal">
+        <div class="predictor-content" id="predictorContent">
+            <div class="predictor-status-bar"></div>
+            <h2 class="predictor-title">Aviator Predictor</h2>
+            <div class="predictor-value" id="predictorValue">1.00x</div>
+            <div class="predictor-current" id="predictorCurrent">Current: 1.00x</div>
+            <div class="predictor-countdown" id="predictorCountdown"></div>
+            <div class="predictor-label">Next Burst Value</div>
+            <div class="predictor-home-indicator"></div>
+            <button class="predictor-close" id="predictorClose">&times;</button>
+        </div>
+    </div>
+
+    <!-- Add Auto Bet Modal -->
+    <div class="auto-bet-modal" id="autoBetModal">
+        <div class="auto-bet-content">
+            <div class="auto-bet-header">
+                <h2>Auto Bet Settings</h2>
+                <button class="auto-bet-close" id="autoBetClose">&times;</button>
+            </div>
+            <form id="autoBetForm">
+                <div class="auto-bet-form-group">
+                    <label for="autoBetAmount">Bet Amount</label>
+                    <input type="number" id="autoBetAmount" required min="1" step="0.01">
+                </div>
+                <div class="auto-bet-form-group">
+                    <label for="autoBetMultiplier">Cashout at Multiplier</label>
+                    <input type="number" id="autoBetMultiplier" required min="1.01" step="0.01">
+                </div>
+                <div class="auto-bet-form-group">
+                    <label for="autoBetRounds">Number of Rounds</label>
+                    <input type="number" id="autoBetRounds" required min="1" max="100">
+                </div>
+                <div class="auto-bet-actions">
+                    <button type="submit" class="auto-bet-button">Start Auto Bet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        let gameActive = false;
+        let currentMultiplier = 1.00;
+        let gameInterval;
+        let gameSpeed = 0.015; // Perfect speed - not too fast, not too slow
+        let gameStartTime = 0; // Track when the game started for deterministic progression
+        let flightPath = [];
+        let planeX = 10;
+        let planeY = 10;
+        let angle = 0;
+        let previousResults = [];
+        let currentRoundBustValue = null; // Store the current round's bust value
+        let predictorActive = false; // Track if predictor is currently open
+        
+        // Plane speed controls
+        let planeSpeedX = 0.06; // Horizontal speed
+        let planeSpeedY = 0.035; // Vertical speed
+        let planeRotationSpeed = 0.0008; // Rotation speed
+        let planeVariationSpeed = 0.006; // Flight variation speed
+        
+        // Interactive plane variables
+        let interactiveOffset = { x: 0, y: 0 };
+        let isDragging = false;
+        
+        // Admin control is now handled via sessionStorage
+        let nextBustValue = null;
+        let nextBustValueReady = false;
+        let checkAdminValuesInterval;
+        
+        // Betting variables
+        let bet1 = { amount: 10.00, autoCashoutAt: 0, active: false, cashed: false };
+        let bet2 = { amount: 10.00, autoCashoutAt: 0, active: false, cashed: false };
+        
+        // Sample previous results with realistic Aviator values (no 1.78 to avoid repetition)
+        const sampleResults = [1.23, 1.45, 1.67, 1.12, 1.89, 2.34, 1.56, 1.34, 3.45, 1.67, 1.89, 2.12, 1.45, 4.67, 2.34, 1.56, 1.23, 6.78, 1.45, 2.67, 1.34];
+        
+        // Currency conversion rates (example rates)
+        const currencyRates = {
+            KES: 1,
+            USD: 0.0072,
+            EUR: 0.0065,
+            GBP: 0.0056,
+            JPY: 0.85,
+            ETB: 0.25,
+            PKR: 2.05,
+            GMD: 0.45,
+            ZAR: 0.13,
+            BTC: 0.00000012,
+            ETH: 0.0000025
+        };
+        
+        // Current currency
+        let currentCurrency = "KES";
+        let baseBalance = 5000.00;
+        
+        // Game statistics
+        let gameStats = {
+            totalBets: 446,
+            successfulBets: 394,
+            totalWinAmount: 162719.85
+        };
+        
+        // DOM elements
+        const multiplierDisplay = document.querySelector('.multiplier');
+        const airplane = document.querySelector('.airplane');
+        const gameCanvas = document.querySelector('.game-canvas');
+        const previousResultsDisplay = document.querySelector('.previous-results');
+        const adminButton = document.querySelector('.admin-button');
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const currencySelector = document.getElementById('currencySelector');
+        const successfulBetsDisplay = document.getElementById('successfulBets');
+        const totalBetsDisplay = document.getElementById('totalBets');
+        const totalWinAmountDisplay = document.getElementById('totalWinAmount');
+        const totalWinCurrencyDisplay = document.getElementById('totalWinCurrency');
+        
+        // Bet buttons
+        const bet1Button = document.getElementById('bet1Button');
+        const bet2Button = document.getElementById('bet2Button');
+        const cashout1Button = document.getElementById('cashout1Button');
+        const cashout2Button = document.getElementById('cashout2Button');
+        
+        // Canvas setup for the airplane trail
+        const canvas = document.getElementById('gameTrail');
+        const ctx = canvas.getContext('2d');
+        
+        // Resize canvas to match parent container
+        function resizeCanvas() {
+            canvas.width = gameCanvas.clientWidth;
+            canvas.height = gameCanvas.clientHeight;
+        }
+        
+        // Initialize the game
+        function init() {
+            try {
+                console.log('Initializing game...');
+                resizeCanvas();
+                initializeStats();
+                updateBalanceDisplay();
+                initializeAutoBet(); // Initialize auto bet functionality
+                
+                // Check for admin changes every second
+                checkAdminValuesInterval = setInterval(checkAdminValues, 1000);
+                
+                // Set previous results from sample data
+                previousResults = sampleResults.slice(0, 10);
+                updatePreviousResults();
+                
+                // Initialize nextBustValue for predictor
+                nextBustValue = generateNextBustValue();
+                sessionStorage.setItem('nextBustValue', nextBustValue.toString());
+                
+                console.log('Game initialized successfully, starting new round...');
+                startNewRound();
+            } catch (error) {
+                console.error('Error initializing game:', error);
+            }
+            
+            // Event listeners
+            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('orientationchange', resizeCanvas);
+            
+            // Currency selector
+            currencySelector.addEventListener('change', () => {
+                currentCurrency = currencySelector.value;
+                updateBalanceDisplay();
+                updateStatsDisplay();
+                
+                // Update bet buttons
+                document.querySelectorAll('.betting-card').forEach((card, index) => {
+                    const betButton = card.querySelector('.bet-button.place-bet');
+                    const amount = index === 0 ? bet1.amount : bet2.amount;
+                    betButton.innerHTML = `Bet<br>${convertAmount(amount).toFixed(2)} ${currentCurrency}`;
+                });
+            });
+            
+            // Plane interactivity
+            airplane.addEventListener('mousedown', (e) => {
+                if (gameActive) {
+                    isDragging = true;
+                    e.preventDefault();
+                }
+            });
+            
+            airplane.addEventListener('touchstart', (e) => {
+                if (gameActive) {
+                    isDragging = true;
+                    e.preventDefault();
+                }
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging && gameActive) {
+                    // Calculate movement relative to game canvas
+                    const rect = gameCanvas.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    // Create offset based on mouse position relative to center
+                    interactiveOffset.x = ((e.clientX - centerX) / rect.width) * 20;
+                    interactiveOffset.y = ((centerY - e.clientY) / rect.height) * 20;
+                    
+                    // Limit the offset to reasonable values
+                    interactiveOffset.x = Math.max(-15, Math.min(15, interactiveOffset.x));
+                    interactiveOffset.y = Math.max(-15, Math.min(15, interactiveOffset.y));
+                }
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (isDragging && gameActive && e.touches[0]) {
+                    // Calculate movement relative to game canvas
+                    const rect = gameCanvas.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    // Create offset based on touch position relative to center
+                    interactiveOffset.x = ((e.touches[0].clientX - centerX) / rect.width) * 20;
+                    interactiveOffset.y = ((centerY - e.touches[0].clientY) / rect.height) * 20;
+                    
+                    // Limit the offset to reasonable values
+                    interactiveOffset.x = Math.max(-15, Math.min(15, interactiveOffset.x));
+                    interactiveOffset.y = Math.max(-15, Math.min(15, interactiveOffset.y));
+                    
+                    e.preventDefault();
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                // Gradually reset the offset
+                if (gameActive) {
+                    const resetInterval = setInterval(() => {
+                        interactiveOffset.x *= 0.9;
+                        interactiveOffset.y *= 0.9;
+                        
+                        if (Math.abs(interactiveOffset.x) < 0.1 && Math.abs(interactiveOffset.y) < 0.1) {
+                            interactiveOffset.x = 0;
+                            interactiveOffset.y = 0;
+                            clearInterval(resetInterval);
+                        }
+                    }, 50);
+                }
+            });
+            
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+                // Gradually reset the offset
+                if (gameActive) {
+                    const resetInterval = setInterval(() => {
+                        interactiveOffset.x *= 0.9;
+                        interactiveOffset.y *= 0.9;
+                        
+                        if (Math.abs(interactiveOffset.x) < 0.1 && Math.abs(interactiveOffset.y) < 0.1) {
+                            interactiveOffset.x = 0;
+                            interactiveOffset.y = 0;
+                            clearInterval(resetInterval);
+                        }
+                    }, 50);
+                }
+            });
+            
+            // Admin panel button now shows predictor
+            adminButton.addEventListener('click', () => {
+                const predictorModal = document.getElementById('predictorModal');
+                const predictorContent = document.getElementById('predictorContent');
+                predictorModal.classList.add('active');
+                predictorContent.classList.add('pulse');
+                predictorActive = true;
+                
+                // Update predictor to show current round's bust value
+                updatePredictorValue();
+                
+                            // Start updating predictor value in real-time during active game
+            if (gameActive) {
+                // Update predictor every 100ms during active game
+                const predictorUpdateInterval = setInterval(() => {
+                    if (!gameActive || !predictorActive) {
+                        clearInterval(predictorUpdateInterval);
+                        return;
+                    }
+                    updatePredictorValue();
+                }, 100);
+            } else {
+                // If game is not active, still update predictor periodically
+                const predictorUpdateInterval = setInterval(() => {
+                    if (!predictorActive) {
+                        clearInterval(predictorUpdateInterval);
+                        return;
+                    }
+                    updatePredictorValue();
+                }, 500);
+            }
+                
+                console.log('Predictor activated - showing current round bust value');
+            });
+
+            // Close predictor when clicking close button
+            document.getElementById('predictorClose').addEventListener('click', () => {
+                const predictorModal = document.getElementById('predictorModal');
+                const predictorContent = document.getElementById('predictorContent');
+                predictorModal.classList.remove('active');
+                predictorContent.classList.remove('pulse');
+                predictorActive = false;
+            });
+
+            // Close predictor when clicking outside
+            document.getElementById('predictorModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    const predictorModal = document.getElementById('predictorModal');
+                    const predictorContent = document.getElementById('predictorContent');
+                    predictorModal.classList.remove('active');
+                    predictorContent.classList.remove('pulse');
+                    predictorActive = false;
+                }
+            });
+
+            // Betting controls
+            bet1Button.addEventListener('click', () => placeBet(1));
+            bet2Button.addEventListener('click', () => placeBet(2));
+            cashout1Button.addEventListener('click', () => cashout(1));
+            cashout2Button.addEventListener('click', () => cashout(2));
+
+            // Set up bet amount controls
+            document.querySelectorAll('.betting-card').forEach((card, index) => {
+                const betAmountInput = card.querySelector('input');
+                const betButton = card.querySelector('.bet-button.place-bet');
+                const betAmountButtons = card.querySelectorAll('.bet-amount');
+                
+                betAmountInput.addEventListener('input', () => {
+                    const amount = parseFloat(betAmountInput.value) || 0;
+                    betButton.innerHTML = `Bet<br>${convertAmount(amount).toFixed(2)} ${currentCurrency}`;
+                    if (index === 0) bet1.amount = amount;
+                    else bet2.amount = amount;
+                });
+                
+                betAmountButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const amount = parseFloat(btn.textContent.replace(',', '')) || 0;
+                        betAmountInput.value = amount.toFixed(2);
+                        betButton.innerHTML = `Bet<br>${convertAmount(amount).toFixed(2)} ${currentCurrency}`;
+                        if (index === 0) bet1.amount = amount;
+                        else bet2.amount = amount;
+                    });
+                });
+            });
+        }
+        
+        // Start a new round
+        function startNewRound() {
+            try {
+                console.log('Starting new round...');
+                // Reset game state
+                gameActive = true;
+                currentMultiplier = 1.00;
+                flightPath = [];
+                planeX = 10;
+                planeY = 10;
+                angle = 0;
+                
+                // Reset UI
+                updateMultiplierDisplay();
+                resetPlanePosition();
+                
+                // Reset cashout button styles
+                cashout1Button.classList.remove('pulse');
+                cashout1Button.style.backgroundColor = '#e74c3c';
+                cashout2Button.classList.remove('pulse');
+                cashout2Button.style.backgroundColor = '#e74c3c';
+                
+                // Determine which bets are active
+                updateBetButtons();
+                
+                // Disable new bets when round starts
+                bet1Button.classList.add('disabled');
+                bet2Button.classList.add('disabled');
+                
+                // Use existing nextBustValue if available, otherwise generate new one
+                if (!nextBustValue) {
+                    nextBustValue = generateNextBustValue();
+                }
+                
+                // Store the current round's bust value
+                currentRoundBustValue = nextBustValue;
+                console.log('Starting round with bust value:', currentRoundBustValue);
+                
+                // Set game start time for deterministic progression
+                gameStartTime = Date.now();
+                
+                // Store next bust value
+                sessionStorage.setItem('nextBustValue', currentRoundBustValue.toString());
+                
+                // Update predictor if it's active
+                if (predictorActive) {
+                    updatePredictorValue();
+                }
+                
+                // Start game loop
+                gameInterval = setInterval(updateGame, 40); // Perfect update frequency
+                console.log('New round started successfully');
+            } catch (error) {
+                console.error('Error starting new round:', error);
+            }
+        }
+        
+        // Update game state with deterministic progression
+        function updateGame() {
+            if (!gameActive) return;
+            
+            // Use deterministic progression based on the target burst value
+            const targetBustValue = currentRoundBustValue;
+            const elapsedTime = Date.now() - gameStartTime;
+            const gameDuration = 5000; // 5 seconds total game time
+            
+            // Calculate progress towards burst value (0 to 1)
+            const progress = Math.min(elapsedTime / gameDuration, 1);
+            
+            // Use exponential curve to reach the target burst value
+            const baseMultiplier = 1.0;
+            const multiplierRange = targetBustValue - baseMultiplier;
+            
+            // Exponential curve: starts slow, accelerates towards the end
+            const curve = Math.pow(progress, 1.5);
+            currentMultiplier = baseMultiplier + (multiplierRange * curve);
+            
+            updateMultiplierDisplay();
+            
+            // Adjust plane speed based on current multiplier
+            adjustPlaneSpeedByMultiplier();
+            
+            // Move airplane along a curve synchronized with multiplier
+            updatePlanePosition();
+            
+            // Update potential winnings display on cashout buttons
+            updatePotentialWinnings();
+            
+            // Check for auto cashouts
+            checkAutoCashouts();
+            
+            // Update game status in session storage for admin panel
+            updateGameStatus();
+            
+            // Check if game should end based on time progression
+            const gameTimeElapsed = Date.now() - gameStartTime;
+            const maxGameTime = 5000; // 5 seconds total game time
+            
+            if (gameTimeElapsed >= maxGameTime) {
+                // Ensure we display exactly the target burst value
+                currentMultiplier = parseFloat(currentRoundBustValue.toFixed(2));
+                updateMultiplierDisplay();
+                console.log('Game ending, time elapsed:', gameTimeElapsed, 'ms, Final multiplier:', currentMultiplier, 'Target burst value:', currentRoundBustValue);
+                endGame();
+            }
+        }
+        
+        // Update game status in session storage for admin panel
+        function updateGameStatus() {
+            // Only update once per second to avoid performance issues
+            const now = Date.now();
+            const lastUpdate = parseInt(sessionStorage.getItem('gameStatusLastUpdate') || '0');
+            
+            if (now - lastUpdate > 1000) {
+                sessionStorage.setItem('gameActive', gameActive.toString());
+                sessionStorage.setItem('currentMultiplier', currentMultiplier.toFixed(2));
+                
+                // Count active bets
+                const activeBets = (bet1.active ? 1 : 0) + (bet2.active ? 1 : 0);
+                sessionStorage.setItem('betsPlaced', activeBets.toString());
+                
+                sessionStorage.setItem('gameStatusLastUpdate', now.toString());
+            }
+        }
+        
+        // Update potential winnings on cashout buttons
+        function updatePotentialWinnings() {
+            if (bet1.active && !bet1.cashed) {
+                const winnings = bet1.amount * currentMultiplier;
+                cashout1Button.innerHTML = `Cash Out<br>${winnings.toFixed(2)} ${currentCurrency}`;
+                
+                // Add pulsing effect as multiplier increases
+                if (currentMultiplier > 1.5) {
+                    cashout1Button.classList.add('pulse');
+                }
+                if (currentMultiplier > 2.0) {
+                    cashout1Button.style.backgroundColor = '#f39c12'; // Orange at 2x
+                }
+                if (currentMultiplier > 3.0) {
+                    cashout1Button.style.backgroundColor = '#2ecc71'; // Green at 3x
+                }
+            }
+            
+            if (bet2.active && !bet2.cashed) {
+                const winnings = bet2.amount * currentMultiplier;
+                cashout2Button.innerHTML = `Cash Out<br>${winnings.toFixed(2)} ${currentCurrency}`;
+                
+                // Add pulsing effect as multiplier increases
+                if (currentMultiplier > 1.5) {
+                    cashout2Button.classList.add('pulse');
+                }
+                if (currentMultiplier > 2.0) {
+                    cashout2Button.style.backgroundColor = '#f39c12'; // Orange at 2x
+                }
+                if (currentMultiplier > 3.0) {
+                    cashout2Button.style.backgroundColor = '#2ecc71'; // Green at 3x
+                }
+            }
+        }
+        
+        // Update the multiplier display
+        function updateMultiplierDisplay() {
+            multiplierDisplay.textContent = currentMultiplier.toFixed(2) + 'x';
+        }
+        
+        // Update airplane position synchronized with multiplier
+        function updatePlanePosition() {
+            // Calculate position based on progress towards burst value
+            const progress = (currentMultiplier - 1.0) / (currentRoundBustValue - 1.0);
+            
+            // Calculate new position based on progress
+            angle += planeRotationSpeed;
+            planeX += planeSpeedX;
+            planeY += planeSpeedY;
+            
+            // Add complex flight path variation
+            const flightVariation = Math.sin(angle * 1.2) * planeVariationSpeed;
+            const randomVariation = (Math.random() - 0.5) * planeVariationSpeed * 0.5;
+            planeX += flightVariation + randomVariation;
+            
+            // Ensure the plane utilizes the full screen properly
+            planeY = Math.max(2, Math.min(planeY, 95)); // Allow plane to go higher (2% to 95%)
+            planeX = Math.max(2, Math.min(planeX, 98)); // Allow plane to go further right (2% to 98%)
+            
+            // Calculate position on screen with smooth interpolation
+            const posX = (planeX * gameCanvas.clientWidth) / 100;
+            const posY = gameCanvas.clientHeight - (planeY * gameCanvas.clientHeight) / 100;
+            
+            // Ensure plane stays within canvas boundaries with better screen utilization
+            const maxX = gameCanvas.clientWidth - 60; // Reduced margin for better screen use
+            const maxY = gameCanvas.clientHeight - 40; // Reduced margin for better screen use
+            const minX = 0;
+            const minY = 0;
+            
+            const clampedPosX = Math.max(minX, Math.min(maxX, posX));
+            const clampedPosY = Math.max(minY, Math.min(maxY, posY));
+            
+            // Store path for drawing with smoothing
+            if (flightPath.length === 0 || 
+                Math.abs(clampedPosX - flightPath[flightPath.length - 1].x) > 1.0 ||
+                Math.abs(clampedPosY - flightPath[flightPath.length - 1].y) > 1.0) {
+                flightPath.push({ x: clampedPosX, y: clampedPosY });
+            }
+            
+            // Limit path length for performance
+            if (flightPath.length > 100) {
+                flightPath.shift();
+            }
+            
+            // Update airplane position with clamped values
+            airplane.style.left = clampedPosX + 'px';
+            airplane.style.bottom = planeY + '%';
+            
+            // Calculate rotation based on movement direction (diagonal upward)
+            const baseRotation = 45; // 45 degrees for diagonal movement
+            const rotation = baseRotation + (interactiveOffset.x * 0.2) + (flightVariation * 5);
+            airplane.style.transform = `rotate(${rotation}deg)`;
+            
+            // Position the propeller at the front of the plane
+            const radians = rotation * Math.PI / 180;
+            const propellerX = clampedPosX + Math.cos(radians) * 60; // 60px in front of the plane
+            const propellerY = clampedPosY - Math.sin(radians) * 60;
+            
+            // Ensure propeller also stays within bounds
+            const clampedPropellerX = Math.max(minX, Math.min(maxX, propellerX));
+            const clampedPropellerY = Math.max(minY, Math.min(maxY, propellerY));
+            
+            const propeller = document.querySelector('.propeller');
+            propeller.style.left = clampedPropellerX + 'px';
+            propeller.style.top = clampedPropellerY + 'px';
+            
+            // Draw trail
+            drawTrail();
+        }
+        
+        // Reset airplane position to starting point (bottom-left)
+        function resetPlanePosition() {
+            planeX = 2; // Start from 2% from left for better screen utilization
+            planeY = 2; // Start from 2% from bottom for better screen utilization
+            airplane.style.left = '2%';
+            airplane.style.bottom = '2%';
+            airplane.style.transform = 'rotate(45deg)';
+            airplane.style.opacity = '1'; // Make plane visible again
+            airplane.style.top = 'auto'; // Reset top positioning
+            airplane.style.visibility = 'visible'; // Ensure plane is visible
+            
+            // Also reset the propeller position
+            const propeller = document.querySelector('.propeller');
+            const posX = (planeX * gameCanvas.clientWidth) / 100;
+            const posY = gameCanvas.clientHeight - (planeY * gameCanvas.clientHeight) / 100;
+            propeller.style.left = (posX + 30) + 'px'; // Position it in front of the plane
+            propeller.style.top = posY + 'px';
+            propeller.style.opacity = '1'; // Make propeller visible again
+            propeller.style.visibility = 'visible'; // Ensure propeller is visible
+            
+            // Start the graph at the bottom-left
+            flightPath = [{ x: 0, y: canvas.height }];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Draw airplane trail: curve attached to back tail of plane, extending to bottom-left
+        function drawTrail() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (flightPath.length < 2) return;
+
+            ctx.save();
+            // Calculate the plane's current position (tip of the curve)
+            const planeTip = flightPath[flightPath.length - 1];
+            const startX = 0;
+            const startY = ctx.canvas.height;
+            const endX = planeTip.x;
+            const endY = planeTip.y;
+            const steps = 80;
+            
+            // Exponential curve parameters - curve starts from plane and goes backward
+            const expPower = 2.2; // controls curve steepness
+            const growth = startY - endY;
+
+            // Build curve points from plane position backward to bottom-left
+            let curvePoints = [];
+            for (let i = 0; i <= steps; i++) {
+                let t = i / steps;
+                // Reverse the direction: start from plane (t=0) and go to bottom-left (t=1)
+                let x = endX - t * (endX - startX);
+                let y = endY + growth * Math.pow(t, expPower);
+                curvePoints.push({ x, y });
+            }
+
+            // Fill area under curve (from plane to bottom-left)
+            ctx.beginPath();
+            ctx.moveTo(endX, endY); // Start from plane position
+            for (let pt of curvePoints) ctx.lineTo(pt.x, pt.y);
+            ctx.lineTo(startX, ctx.canvas.height);
+            ctx.lineTo(endX, ctx.canvas.height);
+            ctx.closePath();
+            ctx.globalAlpha = 0.22;
+            ctx.fillStyle = '#ff2d2d';
+            ctx.fill();
+            ctx.globalAlpha = 1;
+
+            // Draw the curve from plane to bottom-left
+            ctx.beginPath();
+            ctx.moveTo(endX, endY); // Start from plane position
+            for (let pt of curvePoints) ctx.lineTo(pt.x, pt.y);
+            let gradient = ctx.createLinearGradient(endX, endY, startX, startY);
+            gradient.addColorStop(0, '#ff2d2d');
+            gradient.addColorStop(1, '#ff2d2d');
+            ctx.strokeStyle = gradient;
+            ctx.shadowColor = '#ff2d2d';
+            ctx.shadowBlur = 16;
+            ctx.lineWidth = 7;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        }
+        
+        // End the game (plane crashed)
+        function endGame() {
+            console.log('endGame function called');
+            gameActive = false;
+            clearInterval(gameInterval);
+            
+            // Add result to previous results
+            // Ensure we use the exact busting value from admin
+            const finalValue = currentMultiplier.toFixed(2);
+            previousResults.unshift(finalValue);
+            if (previousResults.length > 20) {
+                previousResults.pop();
+            }
+            updatePreviousResults();
+            
+            // Debug: Log the crash value
+            console.log('Crash value:', finalValue);
+            
+            // Update game statistics
+            updateGameStats();
+            
+            // Any active bets are lost
+            bet1.active = false;
+            bet2.active = false;
+            updateBetButtons();
+            
+            // Make plane fly to top-right corner and disappear
+            console.log('Starting plane fly away animation...');
+            console.log('Plane element:', airplane);
+            console.log('Game canvas width:', gameCanvas.clientWidth);
+            flyPlaneToCorner();
+            
+            // Show loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.id = 'loadingIndicator';
+            loadingIndicator.style.position = 'absolute';
+            loadingIndicator.style.top = '70%';
+            loadingIndicator.style.left = '50%';
+            loadingIndicator.style.transform = 'translate(-50%, -50%)';
+            loadingIndicator.style.color = 'white';
+            loadingIndicator.style.fontSize = '18px';
+            loadingIndicator.style.fontWeight = 'bold';
+            loadingIndicator.style.textAlign = 'center';
+            loadingIndicator.innerHTML = 'Next round in 5s<br>Place your bets now!';
+            gameCanvas.appendChild(loadingIndicator);
+            
+            // Add loading bar
+            const loadingBarContainer = document.createElement('div');
+            loadingBarContainer.className = 'loading-bar-container';
+            const loadingBar = document.createElement('div');
+            loadingBar.className = 'loading-bar';
+            loadingBarContainer.appendChild(loadingBar);
+            gameCanvas.appendChild(loadingBarContainer);
+            
+            // Add SPRIBE branding box
+            const spribeBox = document.createElement('div');
+            spribeBox.id = 'spribeBox';
+            spribeBox.style.position = 'absolute';
+            spribeBox.style.top = '20px'; // Positioned above the multiplier display
+            spribeBox.style.left = '50%';
+            spribeBox.style.transform = 'translateX(-50%)';
+            spribeBox.style.background = 'linear-gradient(135deg, #1a4d1a 0%, #0d2e0d 100%)';
+            spribeBox.style.border = '3px solid #4a7c59';
+            spribeBox.style.borderRadius = '15px';
+            spribeBox.style.padding = '20px 25px';
+            spribeBox.style.display = 'flex';
+            spribeBox.style.alignItems = 'center';
+            spribeBox.style.gap = '15px';
+            spribeBox.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.6)';
+            spribeBox.style.zIndex = '1000';
+            spribeBox.style.minWidth = '280px';
+            spribeBox.style.backdropFilter = 'blur(15px)';
+            spribeBox.style.borderImage = 'linear-gradient(45deg, #4a7c59, #2d5a3d) 1';
+            
+            // SPRIBE logo (white circle with 'S' and dotted border)
+            const spribeLogo = document.createElement('div');
+            spribeLogo.style.width = '45px';
+            spribeLogo.style.height = '45px';
+            spribeLogo.style.background = 'white';
+            spribeLogo.style.borderRadius = '50%';
+            spribeLogo.style.display = 'flex';
+            spribeLogo.style.alignItems = 'center';
+            spribeLogo.style.justifyContent = 'center';
+            spribeLogo.style.fontWeight = 'bold';
+            spribeLogo.style.fontSize = '24px';
+            spribeLogo.style.color = '#1a4d1a';
+            spribeLogo.style.border = '2px dotted #4a7c59';
+            spribeLogo.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            spribeLogo.textContent = 'S';
+            
+            // SPRIBE text content
+            const spribeContent = document.createElement('div');
+            spribeContent.style.display = 'flex';
+            spribeContent.style.flexDirection = 'column';
+            spribeContent.style.gap = '2px';
+            
+            const spribeTitle = document.createElement('div');
+            spribeTitle.style.color = 'white';
+            spribeTitle.style.fontWeight = 'bold';
+            spribeTitle.style.fontSize = '22px';
+            spribeTitle.style.textShadow = '0 0 15px rgba(255, 255, 255, 0.4)';
+            spribeTitle.style.letterSpacing = '1px';
+            spribeTitle.textContent = 'SPRIBE';
+            
+            const officialGame = document.createElement('div');
+            officialGame.style.color = 'white';
+            officialGame.style.fontSize = '15px';
+            officialGame.style.display = 'flex';
+            officialGame.style.alignItems = 'center';
+            officialGame.style.gap = '6px';
+            officialGame.style.fontWeight = '500';
+            officialGame.innerHTML = 'Official Game <span style="color: #4cd964; font-size: 18px;">✓</span>';
+            
+            const since2018 = document.createElement('div');
+            since2018.style.color = '#4a7c59';
+            since2018.style.fontSize = '12px';
+            since2018.style.fontWeight = '500';
+            since2018.style.opacity = '0.8';
+            since2018.textContent = 'Since 2018';
+            
+            spribeContent.appendChild(spribeTitle);
+            spribeContent.appendChild(officialGame);
+            spribeContent.appendChild(since2018);
+            
+            spribeBox.appendChild(spribeLogo);
+            spribeBox.appendChild(spribeContent);
+            gameCanvas.appendChild(spribeBox);
+            
+            // Enable bet buttons during cooldown - this is where we allow betting between rounds
+            bet1Button.classList.remove('disabled');
+            bet2Button.classList.remove('disabled');
+            
+            // Generate next bust value for predictor (5 seconds before next round)
+            setTimeout(() => {
+                nextBustValue = generateNextBustValue();
+                console.log('Next bust value generated for predictor:', nextBustValue);
+                // Store in session storage for admin panel access
+                sessionStorage.setItem('nextBustValue', nextBustValue.toString());
+                
+                // Update predictor if it's active
+                if (predictorActive) {
+                    updatePredictorValue();
+                }
+            }, 1000); // Generate after 1 second (4 seconds before next round starts)
+            
+            // Start a new round after delay
+            setTimeout(() => {
+                if (loadingIndicator) {
+                    loadingIndicator.remove();
+                }
+                if (loadingBarContainer) {
+                    loadingBarContainer.remove();
+                }
+                if (spribeBox) {
+                    spribeBox.remove();
+                }
+                startNewRound();
+            }, 5000);
+        }
+        
+        // Update the display of previous results
+        function updatePreviousResults() {
+            previousResultsDisplay.innerHTML = '';
+            previousResults.forEach(result => {
+                const resultElement = document.createElement('div');
+                resultElement.className = 'result-bubble';
+                
+                // Use number from string or convert from number
+                const value = typeof result === 'string' ? parseFloat(result) : result;
+                resultElement.textContent = value.toFixed(2) + 'x';
+                
+                // Color based on value
+                if (value < 1.5) {
+                    resultElement.style.color = '#e74c3c'; // Red for low values
+                } else if (value < 5) {
+                    resultElement.style.color = '#f1c40f'; // Yellow for medium values
+                } else {
+                    resultElement.style.color = '#4cd964'; // Green for high values
+                }
+                
+                previousResultsDisplay.appendChild(resultElement);
+            });
+        }
+        
+        // Place a bet
+        function placeBet(betNumber) {
+            // Check if button is disabled
+            const betButton = document.getElementById(`bet${betNumber}Button`);
+            if (betButton.classList.contains('disabled')) {
+                return;
+            }
+            
+            const bet = betNumber === 1 ? bet1 : bet2;
+            const amountInput = document.getElementById(`bet${betNumber}Amount`);
+            
+            // Use auto bet amount if active
+            if (autoBetSettings[`bet${betNumber}`].active) {
+                bet.amount = autoBetSettings[`bet${betNumber}`].amount;
+                amountInput.value = bet.amount;
+            } else {
+                bet.amount = parseFloat(amountInput.value) || 10;
+            }
+            
+            if (bet.amount > 0 && bet.amount <= baseBalance) {
+                // Deduct bet amount from balance
+                baseBalance -= bet.amount;
+                updateBalanceDisplay();
+                
+                bet.active = true;
+                bet.cashed = false;
+                updateBetButtons();
+                
+                // Update game status for admin panel
+                updateGameStatus();
+            } else if (bet.amount > baseBalance) {
+                // Stop auto bet if insufficient balance
+                if (autoBetSettings[`bet${betNumber}`].active) {
+                    stopAutoBet(betNumber);
+                }
+                // Show insufficient funds message
+                const betCard = document.querySelectorAll('.betting-card')[betNumber - 1];
+                const errorMsg = document.createElement('div');
+                errorMsg.style.position = 'absolute';
+                errorMsg.style.top = '50%';
+                errorMsg.style.left = '50%';
+                errorMsg.style.transform = 'translate(-50%, -50%)';
+                errorMsg.style.backgroundColor = 'rgba(231, 76, 60, 0.9)';
+                errorMsg.style.color = 'white';
+                errorMsg.style.padding = '10px 15px';
+                errorMsg.style.borderRadius = '5px';
+                errorMsg.style.fontWeight = 'bold';
+                errorMsg.style.zIndex = '10';
+                errorMsg.textContent = 'Insufficient funds';
+                betCard.style.position = 'relative';
+                betCard.appendChild(errorMsg);
+                
+                // Remove message after 2 seconds
+                setTimeout(() => {
+                    errorMsg.remove();
+                }, 2000);
+            }
+        }
+        
+        // Cash out a bet
+        function cashout(betNumber) {
+            if (!gameActive) return;
+            
+            const bet = betNumber === 1 ? bet1 : bet2;
+            
+            if (bet.active && !bet.cashed) {
+                // Calculate winnings
+                const winnings = bet.amount * currentMultiplier;
+                
+                // Add winnings to balance
+                baseBalance += winnings;
+                updateBalanceDisplay();
+                
+                // Update game statistics for successful cashout
+                gameStats.successfulBets++;
+                gameStats.totalWinAmount += winnings;
+                updateStatsDisplay();
+                
+                // Show temporary success message instead of alert
+                const betCard = document.querySelectorAll('.betting-card')[betNumber - 1];
+                const cashoutMsg = document.createElement('div');
+                cashoutMsg.style.position = 'absolute';
+                cashoutMsg.style.top = '50%';
+                cashoutMsg.style.left = '50%';
+                cashoutMsg.style.transform = 'translate(-50%, -50%)';
+                cashoutMsg.style.backgroundColor = 'rgba(76, 217, 100, 0.9)';
+                cashoutMsg.style.color = 'white';
+                cashoutMsg.style.padding = '10px 15px';
+                cashoutMsg.style.borderRadius = '5px';
+                cashoutMsg.style.fontWeight = 'bold';
+                cashoutMsg.style.zIndex = '10';
+                cashoutMsg.textContent = `${winnings.toFixed(2)} ${currentCurrency}`;
+                betCard.style.position = 'relative';
+                betCard.appendChild(cashoutMsg);
+                
+                // Remove message after 2 seconds
+                setTimeout(() => {
+                    cashoutMsg.remove();
+                }, 2000);
+                
+                bet.cashed = true;
+                updateBetButtons();
+            }
+        }
+        
+        // Check for auto cashouts
+        function checkAutoCashouts() {
+            if (bet1.active && !bet1.cashed && bet1.autoCashoutAt > 0 && currentMultiplier >= bet1.autoCashoutAt) {
+                cashout(1);
+            }
+            
+            if (bet2.active && !bet2.cashed && bet2.autoCashoutAt > 0 && currentMultiplier >= bet2.autoCashoutAt) {
+                cashout(2);
+            }
+        }
+        
+        // Update bet buttons appearance
+        function updateBetButtons() {
+            if (bet1.active && !bet1.cashed) {
+                bet1Button.style.display = 'none';
+                cashout1Button.style.display = 'block';
+                const winnings = bet1.amount * currentMultiplier;
+                cashout1Button.innerHTML = `Cash Out<br>${winnings.toFixed(2)} ${currentCurrency}`;
+            } else {
+                bet1Button.style.display = 'block';
+                cashout1Button.style.display = 'none';
+            }
+            
+            if (bet2.active && !bet2.cashed) {
+                bet2Button.style.display = 'none';
+                cashout2Button.style.display = 'block';
+                const winnings = bet2.amount * currentMultiplier;
+                cashout2Button.innerHTML = `Cash Out<br>${winnings.toFixed(2)} ${currentCurrency}`;
+            } else {
+                bet2Button.style.display = 'block';
+                cashout2Button.style.display = 'none';
+            }
+        }
+        
+        // Start the game when the page loads
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Fallback initialization in case DOMContentLoaded doesn't fire
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            // DOM is already loaded
+            init();
+        }
+        
+        // Initialize auto bet functionality
+        function initializeAutoBet() {
+            // Initialize auto bet buttons
+            document.querySelectorAll('.bet-header button').forEach((button, index) => {
+                button.addEventListener('click', () => {
+                    const modal = document.getElementById('autoBetModal');
+                    modal.classList.add('active');
+                    modal.dataset.betIndex = index + 1;
+                });
+            });
+
+            // Close auto bet modal
+            document.getElementById('autoBetClose').addEventListener('click', () => {
+                document.getElementById('autoBetModal').classList.remove('active');
+            });
+
+            // Close auto bet modal when clicking outside
+            document.getElementById('autoBetModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    e.currentTarget.classList.remove('active');
+                }
+            });
+
+            // Handle auto bet form submission
+            document.getElementById('autoBetForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const betIndex = parseInt(document.getElementById('autoBetModal').dataset.betIndex);
+                const amount = parseFloat(document.getElementById('autoBetAmount').value);
+                const multiplier = parseFloat(document.getElementById('autoBetMultiplier').value);
+                const rounds = parseInt(document.getElementById('autoBetRounds').value);
+                
+                if (amount > baseBalance) {
+                    alert('Insufficient balance for auto bet!');
+                    return;
+                }
+                
+                // Set auto bet settings
+                autoBetSettings[`bet${betIndex}`] = {
+                    active: true,
+                    amount: amount,
+                    multiplier: multiplier,
+                    rounds: rounds,
+                    roundsPlayed: 0
+                };
+                
+                // Update UI
+                const autoButton = document.querySelectorAll('.bet-header button')[betIndex - 1];
+                autoButton.classList.add('auto-bet-active');
+                autoButton.textContent = 'Stop Auto';
+                
+                // Close modal
+                document.getElementById('autoBetModal').classList.remove('active');
+                
+                // Place first bet
+                placeBet(betIndex);
+            });
+        }
+        
+        // Currency utility functions
+        function convertAmount(amount) {
+            // Convert from KES to selected currency
+            return amount * currencyRates[currentCurrency];
+        }
+        
+        function updateBalanceDisplay() {
+            // Convert and format the balance based on selected currency
+            const convertedBalance = baseBalance * currencyRates[currentCurrency];
+            
+            // Format based on currency type
+            let formattedBalance;
+            if (currentCurrency === 'BTC' || currentCurrency === 'ETH') {
+                formattedBalance = convertedBalance.toFixed(8);
+            } else if (currentCurrency === 'JPY') {
+                formattedBalance = Math.round(convertedBalance).toLocaleString();
+            } else {
+                formattedBalance = convertedBalance.toFixed(2);
+            }
+            
+            balanceDisplay.textContent = formattedBalance;
+        }
+        
+        // Update game statistics with realistic Aviator patterns
+        function updateGameStats() {
+            // Realistic betting activity (1-3 new bets per round)
+            const newBets = Math.floor(Math.random() * 3) + 1;
+            gameStats.totalBets += newBets;
+            
+            // Realistic win/loss ratio (about 60-70% success rate)
+            const successRate = 0.65 + (Math.random() * 0.1); // 65-75% success rate
+            const newSuccessfulBets = Math.floor(newBets * successRate);
+            gameStats.successfulBets += newSuccessfulBets;
+            
+            // Generate realistic winning amounts for successful bets
+            for (let i = 0; i < newSuccessfulBets; i++) {
+                const betAmount = 50 + Math.random() * 450; // Random bet between 50-500
+                const multiplier = 1.2 + Math.random() * 3.8; // Realistic multiplier range
+                gameStats.totalWinAmount += betAmount * multiplier;
+            }
+            
+            // Update the display
+            updateStatsDisplay();
+        }
+        
+        // Update statistics display
+        function updateStatsDisplay() {
+            successfulBetsDisplay.textContent = gameStats.successfulBets;
+            totalBetsDisplay.textContent = gameStats.totalBets;
+            
+            // Format total win amount with correct currency
+            const convertedAmount = gameStats.totalWinAmount * currencyRates[currentCurrency];
+            let formattedAmount;
+            
+            if (currentCurrency === 'BTC' || currentCurrency === 'ETH') {
+                formattedAmount = convertedAmount.toFixed(8);
+            } else if (currentCurrency === 'JPY') {
+                formattedAmount = Math.round(convertedAmount).toLocaleString();
+            } else {
+                formattedAmount = convertedAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+            
+            totalWinAmountDisplay.textContent = formattedAmount;
+            totalWinCurrencyDisplay.textContent = currentCurrency;
+        }
+        
+        // Initialize stats display on page load
+        function initializeStats() {
+            updateStatsDisplay();
+        }
+        
+        // Check for updates from admin dashboard
+        function checkAdminValues() {
+            const forceBust = sessionStorage.getItem('forceBust') === 'true';
+            
+            if (forceBust && gameActive) {
+                // If admin wants to force a bust, set the nextBustValue to current multiplier
+                nextBustValue = parseFloat(currentMultiplier.toFixed(2));
+                sessionStorage.removeItem('forceBust'); // Reset after use
+                console.log('Force bust activated: ' + nextBustValue);
+            }
+            
+            // Check if the selected betting site has changed
+            const selectedSite = sessionStorage.getItem('selectedBettingSite');
+            if (selectedSite) {
+                // Update UI to reflect selected site (optional)
+                console.log('Selected betting site: ' + selectedSite);
+            }
+            
+            // Check for admin-set bust value (only if admin dashboard sets it)
+            const adminSetValue = sessionStorage.getItem('adminSetBustValue');
+            if (adminSetValue && gameActive) {
+                nextBustValue = parseFloat(adminSetValue);
+                sessionStorage.removeItem('adminSetBustValue'); // Use once and remove
+                console.log('Admin set bust value: ' + nextBustValue);
+            }
+            
+            // Check for next bust value from session storage (for predictor synchronization)
+            const storedNextBustValue = sessionStorage.getItem('nextBustValue');
+            if (storedNextBustValue && !nextBustValue) {
+                nextBustValue = parseFloat(storedNextBustValue);
+                console.log('Loaded next bust value from storage: ' + nextBustValue);
+            }
+        }
+
+        // Generate next bust value with maximum randomness and unpredictability
+        function generateNextBustValue() {
+            try {
+                // Use multiple sources of randomness for true unpredictability
+                const timestamp = Date.now();
+                const performanceTime = performance.now();
+                const random1 = Math.random();
+                const random2 = Math.random();
+                const random3 = Math.random();
+                const random4 = Math.random(); // Additional randomness source
+                const random5 = Math.random(); // Additional randomness source
+                
+                // Add extra entropy to prevent predictor interference
+                const extraEntropy = predictorActive ? Math.random() * 1000 : 0;
+                
+                // Create a complex seed from multiple sources with additional entropy
+                const seed = (timestamp * random1 + performanceTime * random2 + random3 * 1000000 + random4 * 500000 + random5 * 250000 + extraEntropy) % 1000000;
+                const normalizedSeed = seed / 1000000;
+            
+            // Use the seed to determine the value range
+            let newValue;
+            
+            if (normalizedSeed < 0.4) {
+                // Low values (1.00 - 2.00) - 40% chance
+                const baseValue = 1.00 + (random1 * 1.00);
+                const variation = (random2 - 0.5) * 0.3;
+                newValue = parseFloat((baseValue + variation).toFixed(2));
+            }
+            else if (normalizedSeed < 0.7) {
+                // Medium values (2.00 - 5.00) - 30% chance
+                const baseValue = 2.00 + (random1 * 3.00);
+                const variation = (random2 - 0.5) * 0.5;
+                newValue = parseFloat((baseValue + variation).toFixed(2));
+            }
+            else if (normalizedSeed < 0.85) {
+                // High values (5.00 - 15.00) - 15% chance
+                const baseValue = 5.00 + (random1 * 10.00);
+                const variation = (random2 - 0.5) * 1.0;
+                newValue = parseFloat((baseValue + variation).toFixed(2));
+            }
+            else if (normalizedSeed < 0.95) {
+                // Very high values (15.00 - 50.00) - 10% chance
+                const baseValue = 15.00 + (random1 * 35.00);
+                const variation = (random2 - 0.5) * 2.0;
+                newValue = parseFloat((baseValue + variation).toFixed(2));
+            }
+            else {
+                // Extreme values (50.00 - 100.00) - 5% chance
+                const baseValue = 50.00 + (random1 * 50.00);
+                const variation = (random2 - 0.5) * 5.0;
+                newValue = parseFloat((baseValue + variation).toFixed(2));
+            }
+            
+            // Ensure minimum value and add final randomization
+            newValue = Math.max(1.00, newValue);
+            
+            // Add micro-variations for even more randomness
+            const microVariation = (random3 - 0.5) * 0.1;
+            newValue += microVariation;
+            
+            // Final formatting
+            newValue = parseFloat(newValue.toFixed(2));
+            
+            // Ensure we don't get exactly 1.00 (minimum should be 1.01)
+            if (newValue <= 1.00) {
+                newValue = 1.01;
+            }
+            
+            console.log('Generated bust value:', newValue);
+            return newValue;
+            } catch (error) {
+                console.error('Error generating bust value:', error);
+                // Fallback to a simple random value
+                return 1.01 + Math.random() * 10;
+            }
+        }
+        
+        // Update predictor value (shows current round's bust value)
+        function updatePredictorValue() {
+            // Show the current round's bust value if game is active, otherwise show next round's value
+            let displayValue;
+            let statusText = '';
+            
+            if (gameActive && currentRoundBustValue !== null) {
+                displayValue = parseFloat(currentRoundBustValue).toFixed(2);
+                statusText = 'BURST AT';
+                
+                // Calculate how close we are to the burst value
+                const progress = (currentMultiplier / currentRoundBustValue) * 100;
+                const progressPercent = Math.min(progress, 100);
+                
+                // Add progress indicator
+                const predictorValue = document.getElementById('predictorValue');
+                predictorValue.innerHTML = `${displayValue}x<br><small style="font-size: 12px; color: #ff2d2d;">${progressPercent.toFixed(1)}%</small>`;
+                
+                console.log('Predictor showing current round burst value:', displayValue + 'x', 'Progress:', progressPercent.toFixed(1) + '%');
+            } else if (nextBustValue !== null && nextBustValue !== undefined) {
+                displayValue = parseFloat(nextBustValue).toFixed(2);
+                statusText = 'NEXT BURST';
+                document.getElementById('predictorValue').textContent = displayValue + 'x';
+                console.log('Predictor showing next round burst value:', displayValue + 'x');
+            } else {
+                document.getElementById('predictorValue').textContent = '---';
+                console.log('Predictor: no bust value available');
+                return;
+            }
+            
+            // Update current multiplier display
+            const predictorCurrent = document.getElementById('predictorCurrent');
+            if (predictorCurrent) {
+                predictorCurrent.textContent = `Current: ${currentMultiplier.toFixed(2)}x`;
+            }
+            
+            // Update countdown display
+            const predictorCountdown = document.getElementById('predictorCountdown');
+            if (predictorCountdown && gameActive && currentRoundBustValue !== null) {
+                const remaining = currentRoundBustValue - currentMultiplier;
+                if (remaining > 0) {
+                    predictorCountdown.textContent = `Remaining: +${remaining.toFixed(2)}x`;
+                    predictorCountdown.style.color = '#4cd964';
+                } else {
+                    predictorCountdown.textContent = 'BURST IMMINENT!';
+                    predictorCountdown.style.color = '#ff2d2d';
+                }
+            } else if (predictorCountdown) {
+                predictorCountdown.textContent = '';
+            }
+            
+            // Update status text
+            const predictorLabel = document.querySelector('.predictor-label');
+            if (predictorLabel) {
+                predictorLabel.textContent = statusText;
+            }
+            
+            // Add visual indication if game is active
+            const predictorContent = document.getElementById('predictorContent');
+            if (gameActive) {
+                predictorContent.style.borderColor = '#4cd964'; // Green border when active
+                predictorContent.style.boxShadow = '0 0 20px rgba(76, 217, 100, 0.5)';
+                
+                // Add pulsing effect as we get closer to burst
+                const progress = (currentMultiplier / currentRoundBustValue) * 100;
+                if (progress > 90) {
+                    predictorContent.classList.add('pulse');
+                    predictorContent.style.borderColor = '#ff2d2d';
+                    predictorContent.style.boxShadow = '0 0 30px rgba(255, 45, 45, 0.8)';
+                } else if (progress > 80) {
+                    predictorContent.classList.add('pulse');
+                    predictorContent.style.borderColor = '#ff9500';
+                    predictorContent.style.boxShadow = '0 0 25px rgba(255, 149, 0, 0.6)';
+                } else {
+                    predictorContent.classList.remove('pulse');
+                    predictorContent.style.borderColor = '#4cd964';
+                    predictorContent.style.boxShadow = '0 0 20px rgba(76, 217, 100, 0.5)';
+                }
+            } else {
+                predictorContent.style.borderColor = '#ffffff'; // White border when inactive
+                predictorContent.style.boxShadow = '0 0 20px rgba(255, 45, 45, 0.3)';
+                predictorContent.classList.remove('pulse');
+            }
+        }
+        
+        // Plane speed control functions
+        function setPlaneSpeed(speedLevel) {
+            switch(speedLevel) {
+                case 'slow':
+                    planeSpeedX = 0.06;
+                    planeSpeedY = 0.035;
+                    planeRotationSpeed = 0.0007;
+                    planeVariationSpeed = 0.006;
+                    break;
+                case 'normal':
+                    planeSpeedX = 0.12;
+                    planeSpeedY = 0.065;
+                    planeRotationSpeed = 0.0012;
+                    planeVariationSpeed = 0.01;
+                    break;
+                case 'fast':
+                    planeSpeedX = 0.2;
+                    planeSpeedY = 0.11;
+                    planeRotationSpeed = 0.0025;
+                    planeVariationSpeed = 0.018;
+                    break;
+                case 'ultra':
+                    planeSpeedX = 0.28;
+                    planeSpeedY = 0.15;
+                    planeRotationSpeed = 0.0035;
+                    planeVariationSpeed = 0.025;
+                    break;
+            }
+        }
+        
+        // Adjust plane speed based on multiplier
+        function adjustPlaneSpeedByMultiplier() {
+            // Use deterministic speed based on multiplier
+            if (currentMultiplier > 5) {
+                setPlaneSpeed('fast');
+            } else if (currentMultiplier > 3) {
+                setPlaneSpeed('normal');
+            } else {
+                setPlaneSpeed('normal');
+            }
+            
+            // Calculate speed based on progress towards burst value
+            const progress = (currentMultiplier - 1.0) / (currentRoundBustValue - 1.0);
+            const speedMultiplier = 1.0 + (progress * 0.5); // Increase speed by up to 50%
+            planeSpeedX = 0.12 * speedMultiplier;
+            planeSpeedY = 0.065 * speedMultiplier;
+        }
+        
+        // Make plane fly to top-right corner and disappear
+        function flyPlaneToCorner() {
+            console.log('flyPlaneToCorner function called');
+            
+            // Simple immediate fly away
+            airplane.style.left = (gameCanvas.clientWidth + 200) + 'px';
+            airplane.style.top = '-200px';
+            airplane.style.bottom = 'auto';
+            airplane.style.transform = 'rotate(90deg)';
+            airplane.style.opacity = '0';
+            airplane.style.visibility = 'hidden';
+            
+            // Hide propeller too
+            const propeller = document.querySelector('.propeller');
+            propeller.style.left = (gameCanvas.clientWidth + 260) + 'px';
+            propeller.style.top = '-200px';
+            propeller.style.opacity = '0';
+            propeller.style.visibility = 'hidden';
+            
+            console.log('Plane moved to corner and hidden');
+        }
+
+        // Auto bet variables (global scope)
+        let autoBetSettings = {
+            bet1: { active: false, amount: 0, multiplier: 0, rounds: 0, roundsPlayed: 0 },
+            bet2: { active: false, amount: 0, multiplier: 0, rounds: 0, roundsPlayed: 0 }
+        };
+        
+        // Function to stop auto bet
+        function stopAutoBet(betNumber) {
+            autoBetSettings[`bet${betNumber}`].active = false;
+            const autoButton = document.querySelectorAll('.bet-header button')[betNumber - 1];
+            autoButton.classList.remove('auto-bet-active');
+            autoButton.textContent = 'Auto';
+        }
+
+        // Add deposit and withdraw functionality
+        document.querySelector('.balance-button.deposit').addEventListener('click', () => {
+            const amount = prompt('Enter deposit amount:');
+            if (amount && !isNaN(amount) && amount > 0) {
+                baseBalance += parseFloat(amount);
+                updateBalanceDisplay();
+                alert('Deposit successful!');
+            } else {
+                alert('Please enter a valid amount.');
+            }
+        });
+
+        document.querySelector('.balance-button.withdraw').addEventListener('click', () => {
+            const amount = prompt('Enter withdrawal amount:');
+            if (amount && !isNaN(amount) && amount > 0) {
+                const withdrawAmount = parseFloat(amount);
+                if (withdrawAmount <= baseBalance) {
+                    baseBalance -= withdrawAmount;
+                    updateBalanceDisplay();
+                    alert('Withdrawal successful!');
+                } else {
+                    alert('Insufficient balance.');
+                }
+            } else {
+                alert('Please enter a valid amount.');
+            }
+        });
+
+
+    </script>
+</body>
+</html>
+
